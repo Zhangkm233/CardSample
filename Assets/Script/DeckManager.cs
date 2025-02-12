@@ -25,9 +25,9 @@ public class DeckManager : MonoBehaviour
 
     void initializeInitialDeck() {
         initialDeck.Clear();
-        initialDeck.Add(new CardMonster(0001,"Warrior1",Card.CardType.MONSTER,1));
-        initialDeck.Add(new CardMonster(0002,"Warrior2",Card.CardType.MONSTER,1));
-        initialDeck.Add(new CardMonster(0003,"Warrior3",Card.CardType.MONSTER,1));
+        initialDeck.Add(new CardMonster(0001,"warrior",Card.CardType.MONSTER,1,3,4,1));
+        initialDeck.Add(new CardMonster(0002,"mage",Card.CardType.MONSTER,1,4,1,2));
+        initialDeck.Add(new CardMonster(0003,"rouge",Card.CardType.MONSTER,1,2,2,2));
     }
     void initializeDeck() {
         print("³õÊ¼»¯ÅÆ×é.");

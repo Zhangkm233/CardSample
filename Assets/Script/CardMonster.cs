@@ -14,11 +14,18 @@ public class CardMonster : Card
         this.speed = 1;
         this.sprite = null;
     }
-    public CardMonster(int id,string name,string type,int cost, int attack,int health, int speed, Sprite sprite):base(id,name, CardType.MONSTER,cost){
+    public CardMonster(int id,string name,Card.CardType type,int cost, int attack,int health, int speed, Sprite sprite):base(id,name, CardType.MONSTER,cost){
         this.attack = attack;
         this.health = health;
         this.speed = speed;
         this.sprite = sprite;
+    }
+
+    public CardMonster(int id,string name,Card.CardType type,int cost,int attack,int health,int speed) : base(id,name,CardType.MONSTER,cost) {
+        this.attack = attack;
+        this.health = health;
+        this.speed = speed;
+        this.sprite = null;
     }
 
     public override void play() {

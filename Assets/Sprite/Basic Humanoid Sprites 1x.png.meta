@@ -146,7 +146,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 2
-        y: 37
+        y: 35
         width: 16
         height: 16
       alignment: 0
@@ -211,8 +211,8 @@ TextureImporter:
       name: Basic Humanoid Sprites 1x_3
       rect:
         serializedVersion: 2
-        x: 56
-        y: 37
+        x: 55
+        y: 35
         width: 16
         height: 16
       alignment: 0

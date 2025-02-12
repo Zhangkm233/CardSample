@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3412150509220372797}
   - component: {fileID: 341510557843809765}
   m_Layer: 0
-  m_Name: warrior
+  m_Name: CardPrefab
   m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -100,5 +100,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78c1c159b62a6014ab3979ea90d166ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
   x: 0
   y: 0
+  warriorSprite: {fileID: -1246491857428178395, guid: 70264c0d5f4d6b54a812b2f4a9383f0b, type: 3}
+  mageSprite: {fileID: -7249440387904864664, guid: 70264c0d5f4d6b54a812b2f4a9383f0b, type: 3}
+  rougeSprite: {fileID: 2697986245784636298, guid: 70264c0d5f4d6b54a812b2f4a9383f0b, type: 3}

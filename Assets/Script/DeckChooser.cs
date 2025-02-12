@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class DeckChooser : MonoBehaviour
 {
     public Dropdown dropdown;
+    public Text text;
     public GameObject GameManager;
     public Card selectedCard;
     public List<Card> Deck = new List<Card>();

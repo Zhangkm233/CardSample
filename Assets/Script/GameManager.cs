@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public GameObject MainCamera;
     public GameObject Canvas;
-    public GameObject warriorPrefab;
+    public GameObject CardPrefab;
+    public GameObject GoplayButton;
     DeckChooser deckChooser;
     MouseInputManager mouseInputManager;
     BattleFieldManager battleFieldManager;
@@ -33,10 +35,18 @@ public class GameManager : MonoBehaviour
         //field = battleFieldManager.field;
     }
 
-    void goPlanning() {
+    public void goPlanning() {
         GameData.gameState = GameData.GameState.PLANNING;
     }
-
+    public void goPlay() {
+        GameData.gameState = GameData.GameState.PLAYING;
+        GameObject[] cards = GameObject.FindGameObjectsWithTag("Card");
+        foreach (GameObject card in cards) {
+            card.GetComponent<CardController>().movement();
+        }
+        goPlanning();
+        GoplayButton.SetActive(true);
+    }
 
     void clickEvent() {
         if (Input.GetMouseButtonDown(0)) {
@@ -51,7 +61,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void spawnPrefab() {
+    public void spawnPrefab() {
         //按下时，在准备阶段的事件
         if (deckChooser.selectedCard != null) {
             if (mouseInputManager.ClickField() != null) {
@@ -59,7 +69,9 @@ public class GameManager : MonoBehaviour
                 Card selectCard = deckChooser.selectedCard;
                 TileManager tileManager = targetTile.GetComponent<TileManager>();
 
-                if (tileManager.hasBeenClicked == false) {
+                if (tileManager.hasBeenClicked == false && selectCard.cardType == Card.CardType.MONSTER) {
+                    //如果格子没有被点击过，且选择的是怪兽卡
+                    CardMonster selectCardMonster = (CardMonster)deckChooser.selectedCard;
                     print(tileManager.x + " " + tileManager.y + " " + selectCard.name);
                     //设置二维数组的值
                     battleFieldManager.field[tileManager.x,tileManager.y] = selectCard;
@@ -74,18 +86,19 @@ public class GameManager : MonoBehaviour
                     int WorldX = tileManager.x - 6;
                     int WorldY = tileManager.y - 4;
                     // 生成预制体
-                    GameObject cardObj = GameObject.Instantiate(warriorPrefab);
+                    GameObject cardObj = GameObject.Instantiate(CardPrefab);
                     cardObj.transform.position = new Vector2(WorldX,WorldY);
-                    cardObj.name = "warrior " + tileManager.x + "," + tileManager.y;
-                    cardObj.GetComponent<Warrior>().card = selectCard;
-                    cardObj.GetComponent<Warrior>().x = WorldX;
-                    cardObj.GetComponent<Warrior>().y = WorldY;
+                    cardObj.name = "Card " + tileManager.x + "," + tileManager.y;
+                    cardObj.GetComponent<CardController>().card = selectCardMonster;
+                    cardObj.GetComponent<CardController>().gameManager = this.gameObject;
+                    cardObj.GetComponent<CardController>().x = tileManager.x;
+                    cardObj.GetComponent<CardController>().y = tileManager.y;
                 }
             }
         }
     }
 
-    void cancelPrefab() {
+    public void cancelPrefab() {
         if (mouseInputManager.ClickField() == null) return;
 
         GameObject targetTile = mouseInputManager.ClickField();
@@ -102,7 +115,7 @@ public class GameManager : MonoBehaviour
         spriteRenderer.sprite = tileManager.emptySprite;
         tileManager.hasBeenClicked = false;
 
-        GameObject cardObj = GameObject.Find("warrior " + tileManager.x + "," + tileManager.y);
+        GameObject cardObj = GameObject.Find("Card " + tileManager.x + "," + tileManager.y);
         if (cardObj != null) {
             Destroy(cardObj);
         }
