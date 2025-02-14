@@ -1,17 +1,19 @@
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEditor.Search;
 using UnityEngine;
-
+[SerializeField]
 public class BattleFieldManager : MonoBehaviour
 {
     public static int xfieldSize = GameData.xfieldSize;
     public static int yfieldSize = GameData.yfieldSize;
-    public Card[,] field;
+    [SerializeField] public Card[,] field;
     public GameObject tilePrefab;
     public float tileSize = 1.0f;
     void Start()
     {
         initializeField();
+        initializeEnemy();
     }
 
     // Update is called once per frame
@@ -54,9 +56,51 @@ public class BattleFieldManager : MonoBehaviour
             }
         }
     }
-    public void changeFieldTile(int x, int y, Card card) {
-        if (field[x,y] != null) {
-            field[x,y] = card;
+
+    public void initializeEnemy() {
+        print("初始化敌人");
+        Card[] enemyDeck = GameData.initialEnemy;
+        for (int i = 0;i < enemyDeck.Length;i++) {
+            Card card = enemyDeck[i];
+            int x = Random.Range(0,xfieldSize);
+            int y = Random.Range(0,yfieldSize);
+            while (field[x,y] != null) {
+                x = Random.Range(0,xfieldSize);
+                y = Random.Range(0,yfieldSize);
+            }
+            addTile(x,y,card);
+            GameObject cardObj = this.GetComponent<GameManager>().spawnMonster(card.name);
+            cardObj.name = "Card " + x + "," + y;
+            cardObj.GetComponent<CardController>().gameManager = this.GetComponent<GameManager>().gameObject;
+            cardObj.GetComponent<CardController>().card = (CardMonster)card;
+            cardObj.GetComponent<CardController>().x = x;
+            cardObj.GetComponent<CardController>().y = y;
+            cardObj.transform.position = new Vector2(x - GameData.xOffset,y - GameData.yOffset);
         }
+    }
+
+    public void clearTile(GameObject tile) {
+        TileManager tileManager = tile.GetComponent<TileManager>();
+        field[tileManager.x,tileManager.y] = null;
+        print("清空:" + tileManager.x + "," + tileManager.y);
+        tileManager.GetComponent<SpriteRenderer>().sprite = tileManager.emptySprite;
+        tileManager.hasBeenClicked = false;
+    }
+
+    public void addTile(GameObject tile,Card card) {
+        TileManager tileManager = tile.GetComponent<TileManager>();
+        field[tileManager.x,tileManager.y] = card;
+        print("添加:" + tileManager.x + "," + tileManager.y + " " + card.name);
+        tileManager.GetComponent<SpriteRenderer>().sprite = tileManager.clickSprite;
+        tileManager.GetComponent<TileManager>().hasBeenClicked = true;
+    }
+
+    public void addTile(int tileX,int tileY,Card card) {
+        GameObject tile = GameObject.Find("Tile (" + tileX + ", " + tileY + ")");
+        TileManager tileManager = tile.GetComponent<TileManager>();
+        field[tileX,tileY] = card;
+        print("添加:" + tileManager.x + "," + tileManager.y + " " + card.name);
+        tileManager.GetComponent<SpriteRenderer>().sprite = tileManager.clickSprite;
+        tileManager.GetComponent<TileManager>().hasBeenClicked = true;
     }
 }

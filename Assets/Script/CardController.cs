@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.U2D;
+using static UnityEngine.InputManagerEntry;
+using UnityEngine.UIElements;
 
 public class CardController : MonoBehaviour
 {
@@ -8,26 +10,30 @@ public class CardController : MonoBehaviour
     public GameObject gameManager;
     public int x;
     public int y;
-    public Sprite warriorSprite;
-    public Sprite mageSprite;
-    public Sprite rougeSprite;
-    BattleFieldManager battleFieldManager;
-    GameObject newTile = null;
-    GameObject oldTile = null;
-    int speed;
+    public int sight;
+    //public Sprite warriorSprite;
+    //public Sprite mageSprite;
+    //public Sprite rougeSprite;
+    public bool isFriendly;
+    protected BattleFieldManager battleFieldManager;
+    protected GameObject newTile = null;
+    protected GameObject oldTile = null;
+    protected int speed;
 
-    private void Start() {
-        initiallizeSprite();
+    protected void Start() {
+        initiallizeData();
         initiallizeManager();
     }
 
-    void initiallizeSprite() {
-        GetComponent<SpriteRenderer>().sprite = card.name switch {
+    protected void initiallizeData() {
+        /*GetComponent<SpriteRenderer>().sprite = card.name switch {
             "warrior" => warriorSprite,
             "mage" => mageSprite,
             "rouge" => rougeSprite,
             _ => null
-        };
+        };*/
+        sight = card.sight;
+        isFriendly = card.isFriendly;
     }
 
     public void initiallizeManager() {
@@ -36,15 +42,66 @@ public class CardController : MonoBehaviour
         speed = card.speed;
     }
 
-    public void movement() {
-        newTile = GameObject.Find("Tile (" + x + ", " + y + ")");
+    public void State() {
+        print(name + "开始行动");
         Card[,] field = battleFieldManager.field;
-        
-        if (IsReachAble(x+speed,y)) {
-            moveTo(x + speed,y);
+        if (sight > 0) {
+            int minX = 999, minY = 999;
+            bool hasFindEnemy = false;
+            for (int i = -sight;i <= sight;i++) {
+                for (int j = - sight;j <= sight;j++) {
+                    if (x + i > GameData.xfieldSize - 1 || y + j > GameData.yfieldSize - 1 || x + i < 0 || y + i < 0) continue;
+                    int tempX = Mathf.Min(Mathf.Max(x + i,0),GameData.xfieldSize - 1);
+                    int tempY = Mathf.Min(Mathf.Max(y + j,0),GameData.yfieldSize - 1);
+                    if (field[tempX,tempY] != null) {
+                        if (field[tempX,tempY].cardType != Card.CardType.MONSTER) continue;
+                        //这里写的有隐患，如果超出了边界，会报错，所以先写成这样
+                        CardMonster cardMonster = field[tempX,tempY] as CardMonster;
+                        if (cardMonster.isFriendly == false && hasFindEnemy == false) {
+                            minX = tempX;
+                            minY = tempY;
+                            hasFindEnemy = true;
+                            continue;
+                        }
+                        if (cardMonster.isFriendly == false) {
+                            print("在" + (tempX) + "," + (tempY) + "发现敌人");
+                            hasFindEnemy = true;
+                            if (Mathf.Abs(i) + Mathf.Abs(j) < Mathf.Abs(minX - x) + Mathf.Abs(minY - y)) {
+                                minX = tempX;
+                                minY = tempY;
+                            }
+                        }
+                    }
+                }
+            }
+            if (hasFindEnemy) {
+                print(name + "攻击" + minX + "," + minY);
+                Attack(minX,minY);
+            } else {
+                print(name + "试图移动");
+                Move();
+            }
         }
     }
-    bool IsReachAble(int goX,int goY) {
+    
+    public virtual void Die() {
+            
+    }
+
+    public virtual void Attack(int targetX,int targetY) {
+        
+    }
+
+    public virtual void Move() {
+        if (IsReachAble(x + speed,y) == false) return;
+        
+        if (IsReachAble(x + speed,y)) {
+            MoveTo(x + speed,y);
+        } else {
+            print(name + "无法移动");
+        }
+    }
+    protected bool IsReachAble(int goX,int goY) {
         Card[,] field = battleFieldManager.field;
         if (goX < 0) return false; 
         if (goY < 0) return false;
@@ -54,28 +111,18 @@ public class CardController : MonoBehaviour
         return true;
     }
 
-    void moveTo(int x,int y) {
+    protected void MoveTo(int goX,int goY) {
         Card[,] field = battleFieldManager.field;
-        battleFieldManager.changeFieldTile(x,y,null);
-        field[x,y] = null;
-        print(this.name + "移动到" + (x + speed) + "," + y);
         x += speed;
+        print(this.name + "移动到" + goX + "," + goY);
+
         oldTile = newTile;
-        newTile = GameObject.Find("Tile (" + x + ", " + y + ")");
+        newTile = GameObject.Find("Tile (" + goX + ", " + goY + ")");
 
-        TileManager oldTileManager = oldTile.GetComponent<TileManager>();
-        print("oldTile:" + oldTileManager.x + "," + oldTileManager.y);
-        oldTileManager.GetComponent<SpriteRenderer>().sprite = oldTileManager.emptySprite;
-        oldTileManager.GetComponent<TileManager>().hasBeenClicked = false;
-
-        TileManager newTileManager = newTile.GetComponent<TileManager>();
-        newTileManager.GetComponent<SpriteRenderer>().sprite = newTileManager.clickSprite;
-        oldTileManager.GetComponent<TileManager>().hasBeenClicked = true;
-
-        transform.position = new Vector2(x - GameData.xOffset,y - GameData.yOffset);
-        battleFieldManager.changeFieldTile(x,y,this.card);
-
-        this.name = "Card " + x + "," + y;
-        field[x,y] = this.card;
+        battleFieldManager.clearTile(oldTile);
+        battleFieldManager.addTile(newTile,card);
+        
+        transform.position = new Vector2(goX - GameData.xOffset,goY - GameData.yOffset);
+        this.name = "Card " + goX + "," + goY;
     }
 }

@@ -1,6 +1,7 @@
 using System.Data;
 using UnityEngine;
 
+[SerializeField]
 public class Card
 {
     public enum CardType

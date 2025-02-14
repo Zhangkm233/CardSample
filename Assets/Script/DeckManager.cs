@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 public class DeckManager : MonoBehaviour
 {
-    public List<Card> initialDeck = new List<Card>();
     public List<Card> Deck = new List<Card>();
     public List<Card> Hand = new List<Card>();
     public List<Card> Graveyard = new List<Card>();
@@ -24,15 +23,17 @@ public class DeckManager : MonoBehaviour
     }
 
     void initializeInitialDeck() {
-        initialDeck.Clear();
-        initialDeck.Add(new CardMonster(0001,"warrior",Card.CardType.MONSTER,1,3,4,1));
-        initialDeck.Add(new CardMonster(0002,"mage",Card.CardType.MONSTER,1,4,1,2));
-        initialDeck.Add(new CardMonster(0003,"rouge",Card.CardType.MONSTER,1,2,2,2));
+        GameData.initialDeck.Clear();
+        GameData.initialDeck.Add(new CardMonster(0001,"warrior",Card.CardType.MONSTER,1,3,4,1,1));
+        GameData.initialDeck.Add(new CardMonster(0002,"mage",Card.CardType.MONSTER,1,4,1,2,2));
+        GameData.initialDeck.Add(new CardMonster(0003,"rouge",Card.CardType.MONSTER,1,2,2,2,1));
+        GameData.initialDeck.Add(new CardMonster(0004,"goblin",Card.CardType.MONSTER,0,0,4,0,0,false));
     }
+
     void initializeDeck() {
         print("初始化牌组.");
         Deck.Clear();
-        foreach (Card card in initialDeck) {
+        foreach (Card card in GameData.initialDeck) {
             print("在主卡组里添加了" + card.name);
             Deck.Add(card);
         }

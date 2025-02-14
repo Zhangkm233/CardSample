@@ -39,11 +39,15 @@ public class GameManager : MonoBehaviour
         GameData.gameState = GameData.GameState.PLANNING;
     }
     public void goPlay() {
+        print("下一回合");
         GameData.gameState = GameData.GameState.PLAYING;
         GameObject[] cards = GameObject.FindGameObjectsWithTag("Card");
+
         foreach (GameObject card in cards) {
-            card.GetComponent<CardController>().movement();
+            //print(card.name + "行动");
+            card.GetComponent<CardController>().State();
         }
+        print("回合结束");
         goPlanning();
         GoplayButton.SetActive(true);
     }
@@ -51,17 +55,17 @@ public class GameManager : MonoBehaviour
     void clickEvent() {
         if (Input.GetMouseButtonDown(0)) {
             if (GameData.gameState == GameData.GameState.PLANNING) {
-                spawnPrefab();
+                deployPrefab();
             }
         }
         if (Input.GetMouseButtonDown(1)) {
             if (GameData.gameState == GameData.GameState.PLANNING) {
-                cancelPrefab();
+                deletePrefab();
             }
         }
     }
 
-    public void spawnPrefab() {
+    public void deployPrefab() {
         //按下时，在准备阶段的事件
         if (deckChooser.selectedCard != null) {
             if (mouseInputManager.ClickField() != null) {
@@ -81,12 +85,13 @@ public class GameManager : MonoBehaviour
                         spriteRenderer.sprite = tileManager.clickSprite;
                     }
                     tileManager.hasBeenClicked = true;
+
                     GameData.totalCost += battleFieldManager.field[tileManager.x,tileManager.y].cost;
 
                     int WorldX = tileManager.x - 6;
                     int WorldY = tileManager.y - 4;
                     // 生成预制体
-                    GameObject cardObj = GameObject.Instantiate(CardPrefab);
+                    GameObject cardObj = spawnMonster(selectCard.name);
                     cardObj.transform.position = new Vector2(WorldX,WorldY);
                     cardObj.name = "Card " + tileManager.x + "," + tileManager.y;
                     cardObj.GetComponent<CardController>().card = selectCardMonster;
@@ -98,7 +103,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void cancelPrefab() {
+    public GameObject spawnMonster(string monsterName) {
+        if (monsterName == null) return null;
+        CardPrefab = monsterName switch {
+            "warrior" => Resources.Load<GameObject>("WarriorPrefab"),
+            "mage" => Resources.Load<GameObject>("MagePrefab"),
+            "rouge" => Resources.Load<GameObject>("RougePrefab"),
+            "goblin" => Resources.Load<GameObject>("GoblinPrefab"),
+            _ => null
+        };
+        return GameObject.Instantiate(CardPrefab);
+    }
+    public void deletePrefab() {
         if (mouseInputManager.ClickField() == null) return;
 
         GameObject targetTile = mouseInputManager.ClickField();

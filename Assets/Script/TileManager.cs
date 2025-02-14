@@ -10,7 +10,7 @@ public class TileManager : MonoBehaviour
     public int x; // 格子的 x 坐标
     public int y; // 格子的 y 坐标
     public TileType tileType;
-
+    public Card CardOn = null;
     public GameObject GameManager;
 
     public Sprite cornerSprite;
@@ -25,7 +25,7 @@ public class TileManager : MonoBehaviour
         // 自动调整碰撞器大小
         BoxCollider collider = GetComponent<BoxCollider>();
         collider.size = new Vector3(1,1,0.1f); // 设置碰撞器大小
-
+        if (hasBeenClicked) return;
         if(tileType == TileType.CORNER) {
             GetComponent<SpriteRenderer>().sprite = cornerSprite;
             emptySprite = cornerSprite;
@@ -44,16 +44,7 @@ public class TileManager : MonoBehaviour
         if (!hasBeenClicked) GetComponent<SpriteRenderer>().sprite = pointSprite;
     }
     private void OnMouseDown() {
-        /*
-        if (hasBeenClicked) {
-            GetComponent<SpriteRenderer>().sprite = emptySprite;
-            hasBeenClicked = false;
-            GameManager.gameObject.GetComponent<BattleFieldManager>().changeFieldTile(x,y,null);
-        } else if (!hasBeenClicked) {
-            GetComponent<SpriteRenderer>().sprite = clickSprite;
-            hasBeenClicked = true;
-        }
-        */
+
     }
     private void OnMouseExit() {
         if (!hasBeenClicked) GetComponent<SpriteRenderer>().sprite = emptySprite;
