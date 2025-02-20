@@ -87,6 +87,11 @@ public class BattleFieldManager : MonoBehaviour
         tileManager.hasBeenClicked = false;
     }
 
+    public void clearTile(int tileX,int tileY) {
+        GameObject tile = GameObject.Find("Tile (" + tileX + ", " + tileY + ")");
+        clearTile(tile);
+    }
+
     public void addTile(GameObject tile,Card card) {
         TileManager tileManager = tile.GetComponent<TileManager>();
         field[tileManager.x,tileManager.y] = card;

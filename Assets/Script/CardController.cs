@@ -11,6 +11,7 @@ public class CardController : MonoBehaviour
     public int x;
     public int y;
     public int sight;
+    public int health;
     //public Sprite warriorSprite;
     //public Sprite mageSprite;
     //public Sprite rougeSprite;
@@ -19,21 +20,16 @@ public class CardController : MonoBehaviour
     protected GameObject newTile = null;
     protected GameObject oldTile = null;
     protected int speed;
-
+    Card[,] field;
     protected void Start() {
         initiallizeData();
         initiallizeManager();
     }
 
     protected void initiallizeData() {
-        /*GetComponent<SpriteRenderer>().sprite = card.name switch {
-            "warrior" => warriorSprite,
-            "mage" => mageSprite,
-            "rouge" => rougeSprite,
-            _ => null
-        };*/
         sight = card.sight;
         isFriendly = card.isFriendly;
+        health = card.health;
     }
 
     public void initiallizeManager() {
@@ -42,9 +38,14 @@ public class CardController : MonoBehaviour
         speed = card.speed;
     }
 
+    public void UpdateData() {
+        health = card.health;
+    }
+
     public void State() {
+        //UpdateData();
         print(name + "开始行动");
-        Card[,] field = battleFieldManager.field;
+        field = battleFieldManager.field;
         if (sight > 0) {
             int minX = 999, minY = 999;
             bool hasFindEnemy = false;
@@ -85,11 +86,22 @@ public class CardController : MonoBehaviour
     }
     
     public virtual void Die() {
-            
+            Destroy(this.gameObject);
     }
 
     public virtual void Attack(int targetX,int targetY) {
-        
+        //print(name + "开始攻击" + targetX + " " + targetY);
+        field = battleFieldManager.field;
+        //CardMonster targetMonster = (CardMonster)field[targetX,targetY];
+        GameObject targetMonsterGameobject = GameObject.Find("Card " + targetX + "," + targetY);
+        //targetMonster.health -= card.attack;
+        targetMonsterGameobject.GetComponent<CardController>().health -= card.attack;
+        print(name + "对" + targetX + "," + targetY + "造成" + card.attack + "点伤害，剩余血量：" + targetMonsterGameobject.GetComponent<CardController>().health);
+        //targetMonsterGameobject.GetComponent<CardController>().UpdateData();
+        if (targetMonsterGameobject.GetComponent<CardController>().health <= 0) {
+            battleFieldManager.clearTile(targetX,targetY);
+            targetMonsterGameobject.GetComponent<CardController>().Die();
+        }
     }
 
     public virtual void Move() {
@@ -112,7 +124,7 @@ public class CardController : MonoBehaviour
     }
 
     protected void MoveTo(int goX,int goY) {
-        Card[,] field = battleFieldManager.field;
+        field = battleFieldManager.field;
         x += speed;
         print(this.name + "移动到" + goX + "," + goY);
 

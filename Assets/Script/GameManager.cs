@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
                     GameObject cardObj = spawnMonster(selectCard.name);
                     cardObj.transform.position = new Vector2(WorldX,WorldY);
                     cardObj.name = "Card " + tileManager.x + "," + tileManager.y;
-                    cardObj.GetComponent<CardController>().card = selectCardMonster;
+                    cardObj.GetComponent<CardController>().card = (CardMonster)battleFieldManager.field[tileManager.x,tileManager.y];
                     cardObj.GetComponent<CardController>().gameManager = this.gameObject;
                     cardObj.GetComponent<CardController>().x = tileManager.x;
                     cardObj.GetComponent<CardController>().y = tileManager.y;
