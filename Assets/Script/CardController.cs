@@ -3,11 +3,15 @@ using UnityEngine.Tilemaps;
 using UnityEngine.U2D;
 using static UnityEngine.InputManagerEntry;
 using UnityEngine.UIElements;
+using UnityEngine.UI;
+using JetBrains.Annotations;
+using Unity.VisualScripting;
 
 public class CardController : MonoBehaviour
 {
     public CardMonster card;
     public GameObject gameManager;
+    public Text healthText;
     public int x;
     public int y;
     public int sight;
@@ -30,20 +34,22 @@ public class CardController : MonoBehaviour
         sight = card.sight;
         isFriendly = card.isFriendly;
         health = card.health;
+        speed = card.speed;
     }
 
     public void initiallizeManager() {
         battleFieldManager = gameManager.GetComponent<BattleFieldManager>();
         newTile = GameObject.Find("Tile (" + x + ", " + y + ")");
-        speed = card.speed;
+        healthText = this.gameObject.GetComponentInChildren<Canvas>().GetComponentInChildren<Text>();
+        healthText.text = health.ToString();
     }
 
     public void UpdateData() {
-        health = card.health;
+        healthText.text = health.ToString();
     }
 
     public void State() {
-        //UpdateData();
+        UpdateData();
         print(name + "开始行动");
         field = battleFieldManager.field;
         if (sight > 0) {
@@ -97,6 +103,7 @@ public class CardController : MonoBehaviour
         //targetMonster.health -= card.attack;
         targetMonsterGameobject.GetComponent<CardController>().health -= card.attack;
         print(name + "对" + targetX + "," + targetY + "造成" + card.attack + "点伤害，剩余血量：" + targetMonsterGameobject.GetComponent<CardController>().health);
+        targetMonsterGameobject.GetComponent<CardController>().UpdateData();
         //targetMonsterGameobject.GetComponent<CardController>().UpdateData();
         if (targetMonsterGameobject.GetComponent<CardController>().health <= 0) {
             battleFieldManager.clearTile(targetX,targetY);

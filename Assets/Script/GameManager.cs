@@ -98,6 +98,7 @@ public class GameManager : MonoBehaviour
                     cardObj.GetComponent<CardController>().gameManager = this.gameObject;
                     cardObj.GetComponent<CardController>().x = tileManager.x;
                     cardObj.GetComponent<CardController>().y = tileManager.y;
+                    cardObj.GetComponent<CardController>().healthText = cardObj.GetComponentInChildren<Canvas>().GetComponentInChildren<Text>();
                 }
             }
         }
